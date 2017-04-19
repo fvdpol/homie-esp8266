@@ -4,9 +4,12 @@
 #include <functional>
 #include "Arduino.h"
 
+#include "./Homie/Datatypes/Callbacks.hpp"
+
 namespace HomieInternals {
+class HomieClass;
 class Config;
-class Helpers;
+class Validation;
 class BootConfig;
 
 class IHomieSetting {
@@ -14,7 +17,6 @@ class IHomieSetting {
   IHomieSetting() {}
 
   virtual bool isBool() const { return false; }
-  virtual bool isUnsignedLong() const { return false; }
   virtual bool isLong() const { return false; }
   virtual bool isDouble() const { return false; }
   virtual bool isConstChar() const { return false; }
@@ -25,8 +27,9 @@ class IHomieSetting {
 
 template <class T>
 class HomieSetting : public HomieInternals::IHomieSetting {
+  friend HomieInternals::HomieClass;
   friend HomieInternals::Config;
-  friend HomieInternals::Helpers;
+  friend HomieInternals::Validation;
   friend HomieInternals::BootConfig;
 
  public:
@@ -34,7 +37,7 @@ class HomieSetting : public HomieInternals::IHomieSetting {
   T get() const;
   bool wasProvided() const;
   HomieSetting<T>& setDefaultValue(T defaultValue);
-  HomieSetting<T>& setValidator(std::function<bool(T candidate)> validator);
+  HomieSetting<T>& setValidator(const std::function<bool(T candidate)>& validator);
 
  private:
   const char* _name;
@@ -51,7 +54,6 @@ class HomieSetting : public HomieInternals::IHomieSetting {
   const char* getDescription() const;
 
   bool isBool() const;
-  bool isUnsignedLong() const;
   bool isLong() const;
   bool isDouble() const;
   bool isConstChar() const;

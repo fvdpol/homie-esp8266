@@ -24,29 +24,32 @@ disableLogging	KEYWORD2
 setLoggingPrinter	KEYWORD2
 disableLedFeedback	KEYWORD2
 setLedPin	KEYWORD2
+setConfigurationApPassword	KEYWORD2
 setGlobalInputHandler	KEYWORD2
 setBroadcastHandler	KEYWORD2
 onEvent	KEYWORD2
 setResetTrigger	KEYWORD2
 disableResetTrigger	KEYWORD2
-setResetFunction	KEYWORD2
 setSetupFunction	KEYWORD2
 setLoopFunction	KEYWORD2
 setStandalone	KEYWORD2
-setNodeProperty	KEYWORD2
+reset	KEYWORD2
 setIdle	KEYWORD2
-eraseConfiguration	KEYWORD2
 isConfigured	KEYWORD2
 isConnected	KEYWORD2
 getConfiguration	KEYWORD2
 getMqttClient	KEYWORD2
+getLogger	KEYWORD2
 prepareToSleep	KEYWORD2
 
 # HomieNode
 
+getId	KEYWORD2
+getType	KEYWORD2
 advertise	KEYWORD2
 advertiseRange	KEYWORD2
 settable	KEYWORD2
+setProperty	KEYWORD2
 
 # HomieSetting
 

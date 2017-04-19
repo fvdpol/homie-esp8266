@@ -9,15 +9,17 @@
 #include <DNSServer.h>
 #include <ArduinoJson.h>
 #include "Boot.hpp"
-#include "../Config.hpp"
 #include "../Constants.hpp"
 #include "../Limits.hpp"
 #include "../Datatypes/Interface.hpp"
 #include "../Timer.hpp"
-#include "../Helpers.hpp"
+#include "../Utils/DeviceId.hpp"
+#include "../Utils/Validation.hpp"
+#include "../Utils/Helpers.hpp"
 #include "../Logger.hpp"
 #include "../Strings.hpp"
 #include "../../HomieSetting.hpp"
+#include "../../StreamingOperator.hpp"
 
 namespace HomieInternals {
 class BootConfig : public Boot {
@@ -39,6 +41,7 @@ class BootConfig : public Boot {
   bool _flaggedForReboot;
   uint32_t _flaggedForRebootAt;
   bool _proxyEnabled;
+  char _apIpStr[MAX_IP_STRING_LENGTH];
 
   void _onCaptivePortal();
   void _onDeviceInfoRequest();

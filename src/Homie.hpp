@@ -1,17 +1,23 @@
 #pragma once
 
+#include "Arduino.h"
+
 #include <AsyncMqttClient.h>
-#include "Homie/Blinker.hpp"
-#include "Homie/Logger.hpp"
-#include "Homie/Config.hpp"
+#include "Homie/Datatypes/Interface.hpp"
 #include "Homie/Constants.hpp"
 #include "Homie/Limits.hpp"
-#include "Homie/Helpers.hpp"
+#include "Homie/Utils/DeviceId.hpp"
 #include "Homie/Boot/Boot.hpp"
 #include "Homie/Boot/BootStandalone.hpp"
 #include "Homie/Boot/BootNormal.hpp"
 #include "Homie/Boot/BootConfig.hpp"
+#include "Homie/Logger.hpp"
+#include "Homie/Config.hpp"
+#include "Homie/Blinker.hpp"
 
+#include "SendingPromise.hpp"
+#include "HomieBootMode.hpp"
+#include "HomieEvent.hpp"
 #include "HomieNode.hpp"
 #include "HomieSetting.hpp"
 #include "StreamingOperator.hpp"
@@ -20,36 +26,6 @@
 #define Homie_setBrand(brand) const char* __FLAGGED_BRAND = "\xfb\x2a\xf5\x68\xc0" brand "\x6e\x2f\x0f\xeb\x2d"; Homie.__setBrand(__FLAGGED_BRAND);
 
 namespace HomieInternals {
-class HomieClass;
-
-class SendingPromise {
-  friend HomieClass;
-
- public:
-  explicit SendingPromise(HomieClass* homie);
-  SendingPromise& setQos(uint8_t qos);
-  SendingPromise& setRetained(bool retained);
-  SendingPromise& setRange(HomieRange range);
-  SendingPromise& setRange(uint16_t rangeIndex);
-  uint16_t send(const String& value);
-
- private:
-  SendingPromise& setNode(const HomieNode& node);
-  SendingPromise& setProperty(const String& property);
-  const HomieNode* getNode() const;
-  const String* getProperty() const;
-  uint8_t getQos() const;
-  HomieRange getRange() const;
-  bool isRetained() const;
-
-  HomieClass* _homie;
-  const HomieNode* _node;
-  const String* _property;
-  uint8_t _qos;
-  bool _retained;
-  HomieRange _range;
-};
-
 class HomieClass {
   friend class ::HomieNode;
   friend SendingPromise;
@@ -61,42 +37,42 @@ class HomieClass {
   void loop();
 
   void __setFirmware(const char* name, const char* version);
-  void __setBrand(const char* brand);
+  void __setBrand(const char* brand) const;
 
   HomieClass& disableLogging();
   HomieClass& setLoggingPrinter(Print* printer);
   HomieClass& disableLedFeedback();
   HomieClass& setLedPin(uint8_t pin, uint8_t on);
-  HomieClass& setGlobalInputHandler(GlobalInputHandler globalInputHandler);
-  HomieClass& setBroadcastHandler(BroadcastHandler broadcastHandler);
-  HomieClass& onEvent(EventHandler handler);
+  HomieClass& setConfigurationApPassword(const char* password);
+  HomieClass& setGlobalInputHandler(const GlobalInputHandler& globalInputHandler);
+  HomieClass& setBroadcastHandler(const BroadcastHandler& broadcastHandler);
+  HomieClass& onEvent(const EventHandler& handler);
   HomieClass& setResetTrigger(uint8_t pin, uint8_t state, uint16_t time);
   HomieClass& disableResetTrigger();
-  HomieClass& setResetFunction(ResetFunction function);
-  HomieClass& setSetupFunction(OperationFunction function);
-  HomieClass& setLoopFunction(OperationFunction function);
-  HomieClass& setStandalone();
+  HomieClass& setSetupFunction(const OperationFunction& function);
+  HomieClass& setLoopFunction(const OperationFunction& function);
+  HomieClass& setHomieBootMode(HomieBootMode bootMode);
+  HomieClass& setHomieBootModeOnNextBoot(HomieBootMode bootMode);
 
-  SendingPromise& setNodeProperty(const HomieNode& node, const String& property) {
-    return _sendingPromise.setNode(node).setProperty(property).setQos(1).setRetained(true).setRange({ .isRange = false, .index = 0 });
-  }
-
-  void setIdle(bool idle);
-  void eraseConfiguration();
-  bool isConfigured() const;
-  bool isConnected() const;
-  const ConfigStruct& getConfiguration() const;
+  static void reset();
+  void reboot();
+  static void setIdle(bool idle);
+  static bool isConfigured();
+  static bool isConnected();
+  static const ConfigStruct& getConfiguration();
   AsyncMqttClient& getMqttClient();
-  void prepareToSleep();
+  Logger& getLogger();
+  static void prepareToSleep();
 
  private:
   bool _setupCalled;
+  bool _firmwareSet;
   Boot* _boot;
   BootStandalone _bootStandalone;
   BootNormal _bootNormal;
   BootConfig _bootConfig;
+  bool _flaggedForReboot;
   SendingPromise _sendingPromise;
-  Interface _interface;
   Logger _logger;
   Blinker _blinker;
   Config _config;

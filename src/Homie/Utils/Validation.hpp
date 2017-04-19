@@ -3,8 +3,10 @@
 #include "Arduino.h"
 
 #include <ArduinoJson.h>
-#include "Limits.hpp"
-#include "../HomieSetting.hpp"
+#include <IPAddress.h>
+#include "Helpers.hpp"
+#include "../Limits.hpp"
+#include "../../HomieSetting.hpp"
 
 namespace HomieInternals {
 struct ConfigValidationResult {
@@ -12,16 +14,11 @@ struct ConfigValidationResult {
   String reason;
 };
 
-class Helpers {
+class Validation {
  public:
-  static void generateDeviceId();
-  static const char* getDeviceId();
-  static uint8_t rssiToPercentage(int32_t rssi);
   static ConfigValidationResult validateConfig(const JsonObject& object);
 
  private:
-  static char _deviceId[8 + 1];
-
   static ConfigValidationResult _validateConfigRoot(const JsonObject& object);
   static ConfigValidationResult _validateConfigWifi(const JsonObject& object);
   static ConfigValidationResult _validateConfigMqtt(const JsonObject& object);

@@ -3,9 +3,16 @@
 Homie for ESP8266
 =================
 
-[![Build Status](https://img.shields.io/travis/marvinroger/homie-esp8266/develop.svg?style=flat-square)](https://travis-ci.org/marvinroger/homie-esp8266) [![Latest Release](https://img.shields.io/badge/release-v2.0.0-yellow.svg?style=flat-square)](https://github.com/marvinroger/homie-esp8266/releases)
+[![Build Status](https://img.shields.io/travis/marvinroger/homie-esp8266/develop.svg?style=flat-square)](https://travis-ci.org/marvinroger/homie-esp8266) [![Latest Release](https://img.shields.io/badge/release-v2.0.0-yellow.svg?style=flat-square)](https://github.com/marvinroger/homie-esp8266/releases) [![Gitter](https://img.shields.io/gitter/room/Homie/ESP8266.svg?style=flat-square)](https://gitter.im/homie-iot/ESP8266)
 
 An Arduino for ESP8266 implementation of [Homie](https://github.com/marvinroger/homie), an MQTT convention for the IoT.
+
+## Note for v1.x users
+
+The new documentation and Web configurator are only for the v2.
+
+* The docs for the v1.5 is available at https://github.com/marvinroger/homie-esp8266/blob/528a4f77c6371366847ebf4def6aba942dfd0c4c/docs/index.md
+* The Web configurator for v1.5 is available at http://marvinroger.github.io/homie-esp8266/
 
 ## Download
 
@@ -29,13 +36,13 @@ const int PIN_RELAY = 5;
 
 HomieNode lightNode("light", "switch");
 
-bool lightOnHandler(HomieRange range, String value) {
+bool lightOnHandler(const HomieRange& range, const String& value) {
   if (value != "true" && value != "false") return false;
 
   bool on = (value == "true");
   digitalWrite(PIN_RELAY, on ? HIGH : LOW);
-  Homie.setNodeProperty(lightNode, "on").send(value);
-  Serial << "Light is " << on ? "on" : "off" << endl;
+  lightNode.setProperty("on").send(value);
+  Homie.getLogger() << "Light is " << (on ? "on" : "off") << endl;
 
   return true;
 }

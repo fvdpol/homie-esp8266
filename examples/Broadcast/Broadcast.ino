@@ -1,7 +1,7 @@
 #include <Homie.h>
 
-bool broadcastHandler(String level, String value) {
-  Serial << "Received broadcast level " << level << ": " << value << endl;
+bool broadcastHandler(const String& level, const String& value) {
+  Homie.getLogger() << "Received broadcast level " << level << ": " << value << endl;
   return true;
 }
 

@@ -9,7 +9,7 @@ PropertyInterface::PropertyInterface()
 : _property(nullptr) {
 }
 
-void PropertyInterface::settable(PropertyInputHandler inputHandler) {
+void PropertyInterface::settable(const PropertyInputHandler& inputHandler) {
   _property->settable(inputHandler);
 }
 
@@ -18,19 +18,26 @@ PropertyInterface& PropertyInterface::setProperty(Property* property) {
   return *this;
 }
 
-HomieNode::HomieNode(const char* id, const char* type, NodeInputHandler inputHandler)
+HomieNode::HomieNode(const char* id, const char* type, const NodeInputHandler& inputHandler)
 : _id(id)
 , _type(type)
 , _properties()
 , _inputHandler(inputHandler) {
   if (strlen(id) + 1 > MAX_NODE_ID_LENGTH || strlen(type) + 1 > MAX_NODE_TYPE_LENGTH) {
-    Serial << F("✖ HomieNode(): either the id or type string is too long") << endl;
+    Interface::get().getLogger() << F("✖ HomieNode(): either the id or type string is too long") << endl;
     Serial.flush();
     abort();
   }
   Homie._checkBeforeSetup(F("HomieNode::HomieNode"));
 
   HomieNode::nodes.push_back(this);
+}
+
+HomieNode::~HomieNode() {
+    Interface::get().getLogger() << F("✖ ~HomieNode(): Destruction of HomieNode object not possible") << endl;
+    Interface::get().getLogger() << F("  Hint: Don't create HomieNode objects as a local variable (e.g. in setup())") << endl;
+    Serial.flush();
+    abort();
 }
 
 PropertyInterface& HomieNode::advertise(const char* property) {
@@ -49,7 +56,11 @@ PropertyInterface& HomieNode::advertiseRange(const char* property, uint16_t lowe
   return _propertyInterface.setProperty(propertyObject);
 }
 
-bool HomieNode::handleInput(String const &property, HomieRange range, String const &value) {
+SendingPromise& HomieNode::setProperty(const String& property) const {
+  return Interface::get().getSendingPromise().setNode(*this).setProperty(property).setQos(1).setRetained(true).overwriteSetter(false).setRange({ .isRange = false, .index = 0 });
+}
+
+bool HomieNode::handleInput(const String& property, const HomieRange& range, const String& value) {
   return _inputHandler(property, range, value);
 }
 
