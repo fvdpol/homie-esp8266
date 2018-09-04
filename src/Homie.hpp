@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 
-#include <AsyncMqttClient.h>
+#include "AsyncMqttClient.h"
 #include "Homie/Datatypes/Interface.hpp"
 #include "Homie/Constants.hpp"
 #include "Homie/Limits.hpp"
@@ -21,6 +21,8 @@
 #include "HomieNode.hpp"
 #include "HomieSetting.hpp"
 #include "StreamingOperator.hpp"
+
+// Define DEBUG for debug
 
 #define Homie_setFirmware(name, version) const char* __FLAGGED_FW_NAME = "\xbf\x84\xe4\x13\x54" name "\x93\x44\x6b\xa7\x75"; const char* __FLAGGED_FW_VERSION = "\x6a\x3f\x3e\x0e\xe1" version "\xb0\x30\x48\xd4\x1a"; Homie.__setFirmware(__FLAGGED_FW_NAME, __FLAGGED_FW_VERSION);
 #define Homie_setBrand(brand) const char* __FLAGGED_BRAND = "\xfb\x2a\xf5\x68\xc0" brand "\x6e\x2f\x0f\xeb\x2d"; Homie.__setBrand(__FLAGGED_BRAND);
@@ -63,6 +65,7 @@ class HomieClass {
   AsyncMqttClient& getMqttClient();
   Logger& getLogger();
   static void prepareToSleep();
+  static void doDeepSleep(uint32_t time_us = 0, RFMode mode = RF_DEFAULT);
 
  private:
   bool _setupCalled;
